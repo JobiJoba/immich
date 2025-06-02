@@ -7,6 +7,7 @@ import 'package:immich_mobile/entities/asset.entity.dart';
 import 'package:immich_mobile/entities/store.entity.dart';
 import 'package:immich_mobile/providers/infrastructure/user.provider.dart';
 import 'package:immich_mobile/providers/memory.provider.dart';
+import 'package:immich_mobile/repositories/album_media.repository.dart';
 import 'package:immich_mobile/services/album.service.dart';
 import 'package:immich_mobile/services/asset.service.dart';
 import 'package:immich_mobile/services/etag.service.dart';
@@ -196,4 +197,10 @@ final assetWatcher =
     StreamProvider.autoDispose.family<Asset?, Asset>((ref, asset) {
   final assetService = ref.watch(assetServiceProvider);
   return assetService.watchAsset(asset.id, fireImmediately: true);
+});
+
+final getAssetsAlbumLocalIdProvider =
+    FutureProvider.family<List<Asset>, String>((ref, localId) async {
+  final albumMediaRepository = ref.watch(albumMediaRepositoryProvider);
+  return await albumMediaRepository.getAssets(localId);
 });

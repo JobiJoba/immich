@@ -42,6 +42,7 @@ class AlbumMediaRepository implements IAlbumMediaRepository {
     return album.assetCountAsync;
   }
 
+  // TODO: LOOK AT THIS for me this is probably a paint point
   @override
   Future<List<Asset>> getAssets(
     String albumId, {

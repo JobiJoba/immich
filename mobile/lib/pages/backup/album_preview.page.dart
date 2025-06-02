@@ -6,6 +6,7 @@ import 'package:immich_mobile/entities/album.entity.dart';
 import 'package:immich_mobile/entities/asset.entity.dart';
 import 'package:immich_mobile/extensions/build_context_extensions.dart';
 import 'package:immich_mobile/extensions/theme_extensions.dart';
+import 'package:immich_mobile/providers/asset.provider.dart';
 import 'package:immich_mobile/repositories/album_media.repository.dart';
 import 'package:immich_mobile/widgets/common/immich_thumbnail.dart';
 
@@ -16,21 +17,8 @@ class AlbumPreviewPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final assets = useState<List<Asset>>([]);
-
-    getAssetsInAlbum() async {
-      assets.value = await ref
-          .read(albumMediaRepositoryProvider)
-          .getAssets(album.localId!);
-    }
-
-    useEffect(
-      () {
-        getAssetsInAlbum();
-        return null;
-      },
-      [],
-    );
+    // final assets = useState<List<Asset>>([]);
+    final assets = ref.watch(getAssetsAlbumLocalIdProvider(album.localId!));
 
     return Scaffold(
       appBar: AppBar(
@@ -59,20 +47,24 @@ class AlbumPreviewPage extends HookConsumerWidget {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
-      body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
+      body: assets.when(
+        error: (error, stack) => Text(error.toString()),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        data: (data) => GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 5,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
+          ),
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            return ImmichThumbnail(
+              asset: data[index],
+              width: 100,
+              height: 100,
+            );
+          },
         ),
-        itemCount: assets.value.length,
-        itemBuilder: (context, index) {
-          return ImmichThumbnail(
-            asset: assets.value[index],
-            width: 100,
-            height: 100,
-          );
-        },
       ),
     );
   }

@@ -380,6 +380,7 @@ class BackupNotifier extends StateNotifier<BackUpState> {
         continue;
       }
 
+      //TODO: LOOK AT THIS for me this is probably a paint point
       final assets = await ref
           .read(albumMediaRepositoryProvider)
           .getAssets(album.album.localId!);
