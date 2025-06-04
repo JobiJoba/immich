@@ -86,21 +86,21 @@ class BottomGalleryBar extends ConsumerWidget {
         if (isDeleted && isStackPrimaryAsset) {
           // Workaround for asset remaining in the gallery
           renderList.deleteAsset(asset);
+          totalAssets.value -= 1;
 
-          // `assetIndex == totalAssets.value - 1` handle the case of removing the last asset
-          // to not throw the error when the next preCache index is called
-          if (totalAssets.value == 1 ||
-              assetIndex.value == totalAssets.value - 1) {
-            // Handle only one asset
-            context.maybePop();
+          // Adjust index if we're at the end of the list
+          if (assetIndex.value >= totalAssets.value) {
+            assetIndex.value = totalAssets.value - 1;
           }
 
-          totalAssets.value -= 1;
-        }
-        if (isDeleted) {
-          ref
-              .read(currentAssetProvider.notifier)
-              .set(renderList.loadAsset(assetIndex.value));
+          // Only load next asset if we have assets left
+          if (totalAssets.value > 0) {
+            ref
+                .read(currentAssetProvider.notifier)
+                .set(renderList.loadAsset(assetIndex.value));
+          } else {
+            context.maybePop();
+          }
         }
         return isDeleted;
       }

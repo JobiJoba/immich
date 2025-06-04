@@ -325,8 +325,18 @@ class RenderList {
   /// This is only a workaround for deleted images still appearing in the gallery
   void deleteAsset(Asset deleteAsset) {
     allAssets?.remove(deleteAsset);
-    _buf.clear();
-    _bufOffset = 0;
+
+    // Only clear buffer if the deleted asset was in it
+    if (_buf.isNotEmpty) {
+      final assetIndex = _buf.indexOf(deleteAsset);
+      if (assetIndex != -1) {
+        _buf.removeAt(assetIndex);
+        // If buffer is now empty, reset it
+        if (_buf.isEmpty) {
+          _bufOffset = 0;
+        }
+      }
+    }
   }
 }
 
